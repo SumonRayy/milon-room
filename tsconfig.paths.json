@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@milon-room/shared": ["packages/shared/src"]
+    }
+  }
+} 

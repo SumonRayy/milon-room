@@ -4,7 +4,9 @@ import { Server as SocketIOServer } from 'socket.io';
 import { ExpressPeerServer } from 'peer';
 import { v4 as uuidv4 } from 'uuid';
 import cors from 'cors';
-import { RoomUser } from '@milon-room/shared';
+import net from 'net';
+// Using local type declaration from types.d.ts file
+import { RoomUser } from './types';
 
 // App setup
 const app = express();
@@ -120,7 +122,51 @@ io.on('connection', (socket) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-}); 
+const PORT = Number(process.env.PORT || 5000);
+
+// Check if a port is available
+const isPortAvailable = (port: number): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const tester = net.createServer()
+      .once('error', () => {
+        resolve(false);
+      })
+      .once('listening', () => {
+        tester.close();
+        resolve(true);
+      })
+      .listen(port);
+  });
+};
+
+// Find an available port
+const findAvailablePort = async (startPort: number): Promise<number> => {
+  let port = startPort;
+  while (!(await isPortAvailable(port))) {
+    console.log(`⚠️  Port ${port} is already in use, trying ${port + 1}...`);
+    port += 1;
+  }
+  return port;
+};
+
+const startServer = async (initialPort: number) => {
+  try {
+    const port = await findAvailablePort(initialPort);
+    
+    server.listen(port, () => {
+      console.log('\n' + 
+        '------------------------------------------------------------\n' +
+        `🚀 Server running on port ${port}\n` +
+        `🌐 Access at http://localhost:${port}\n` +
+        `🔌 Socket.IO endpoint: ws://localhost:${port}\n` +
+        '------------------------------------------------------------'
+      );
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// Start the server with the initial port
+startServer(PORT); 

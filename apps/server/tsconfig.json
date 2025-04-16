@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.paths.json",
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
@@ -9,8 +10,10 @@
     "strict": true,
     "sourceMap": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "composite": true,
+    "noResolve": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "../../packages"]
 } 
